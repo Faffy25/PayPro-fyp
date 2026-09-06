@@ -140,6 +140,7 @@ include APP_ROOT . '/includes/header.php';
   <div class="panel-head">
     <h2>Daily register</h2>
     <div class="spacer"></div>
+    <a class="btn secondary small" href="<?= url('modules/attendance/qr.php') ?>">Attendance QR</a>
     <form method="get" class="filters">
       <div class="field">
         <label for="date">Date</label>

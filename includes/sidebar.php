@@ -16,7 +16,10 @@ function nav_active(string $path): string {
     <?php if (has_role(['admin','hr','manager'])): ?>
       <div class="nav-group">People</div>
       <a href="<?= url('modules/employees/index.php') ?>"<?= nav_active('modules/employees') ?>><span class="ic">&#128100;</span> Employees</a>
-      <a href="<?= url('modules/attendance/index.php') ?>"<?= nav_active('modules/attendance') ?>><span class="ic">&#128337;</span> Attendance</a>
+      <a href="<?= url('modules/attendance/index.php') ?>"<?= nav_active('modules/attendance/index') ?>><span class="ic">&#128337;</span> Attendance</a>
+      <?php if (has_role(['admin','hr'])): ?>
+        <a href="<?= url('modules/attendance/qr.php') ?>"<?= nav_active('attendance/qr') ?>><span class="ic">&#9635;</span> Attendance QR</a>
+      <?php endif; ?>
       <a href="<?= url('modules/leave/index.php') ?>"<?= nav_active('modules/leave') ?>><span class="ic">&#128197;</span> Leave</a>
     <?php else: ?>
       <div class="nav-group">My workspace</div>

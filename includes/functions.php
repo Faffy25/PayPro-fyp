@@ -14,6 +14,13 @@ function url(string $path = ''): string {
     return BASE_URL . '/' . ltrim($path, '/');
 }
 
+/** Absolute URL for the current host — needed inside a QR code a phone will open. */
+function abs_url(string $path = ''): string {
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    return $scheme . '://' . $host . url($path);
+}
+
 function redirect(string $path): void {
     header('Location: ' . url($path));
     exit;
@@ -173,6 +180,80 @@ function setting(string $key, $default = null) {
         }
     }
     return $cache[$key] ?? $default;
+}
+
+/** Insert or update a single setting. */
+function set_setting(string $key, string $value, string $description = ''): void {
+    global $pdo;
+    $pdo->prepare(
+        'INSERT INTO settings (setting_key, setting_value, description) VALUES (?,?,?)
+         ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)'
+    )->execute([$key, $value, $description]);
+}
+
+// ---------------------------------------------------------------
+// QR attendance
+// ---------------------------------------------------------------
+/** Signing key for the attendance QR, created on first use. */
+function attendance_qr_secret(): string {
+    static $secret = null;
+    if ($secret !== null) return $secret;
+    $secret = (string)setting('attendance_qr_secret', '');
+    if ($secret === '') {
+        $secret = bin2hex(random_bytes(16));
+        set_setting('attendance_qr_secret', $secret, 'Signing key for the attendance QR code');
+    }
+    return $secret;
+}
+
+/** Token embedded in the QR, valid only for the given date. */
+function attendance_token(string $date): string {
+    return substr(hash_hmac('sha256', $date, attendance_qr_secret()), 0, 16);
+}
+
+/**
+ * Record a QR scan for an employee: first scan of the day clocks in,
+ * the next one clocks out. Returns a result array for the confirmation screen.
+ */
+function mark_attendance_scan(array $emp): array {
+    global $pdo;
+    $stmt = $pdo->prepare('SELECT * FROM attendance WHERE employee_id = ? AND work_date = CURDATE()');
+    $stmt->execute([$emp['employee_id']]);
+    $row = $stmt->fetch();
+
+    if (!$row) {
+        $status = (int)date('H') >= 9 ? 'Late' : 'Present';
+        $pdo->prepare('INSERT INTO attendance (employee_id, work_date, time_in, status) VALUES (?, CURDATE(), CURTIME(), ?)')
+            ->execute([$emp['employee_id'], $status]);
+        log_action('CREATE', 'Attendance', (int)$pdo->lastInsertId(), 'QR clock-in at ' . date('H:i'));
+        return [
+            'type' => 'in', 'status' => $status,
+            'time_in' => date('H:i'), 'time_out' => null,
+            'message' => 'Clocked in at ' . date('H:i') . ($status === 'Late' ? ' — recorded as late.' : '.'),
+        ];
+    }
+
+    if (!$row['time_out']) {
+        $hours    = max(0, round((strtotime(date('H:i:s')) - strtotime($row['time_in'])) / 3600, 2));
+        $standard = (float)setting('working_hours', 8);
+        $overtime = max(0, round($hours - $standard, 2));
+        $pdo->prepare('UPDATE attendance SET time_out = CURTIME(), hours_worked = ?, overtime_hours = ? WHERE attendance_id = ?')
+            ->execute([$hours, $overtime, $row['attendance_id']]);
+        log_action('UPDATE', 'Attendance', (int)$row['attendance_id'], 'QR clock-out after ' . $hours . ' hours');
+        return [
+            'type' => 'out', 'status' => $row['status'],
+            'time_in' => substr((string)$row['time_in'], 0, 5), 'time_out' => date('H:i'),
+            'hours' => $hours, 'overtime' => $overtime,
+            'message' => 'Clocked out at ' . date('H:i') . '. ' . $hours . ' hours recorded'
+                       . ($overtime ? ', including ' . $overtime . ' overtime.' : '.'),
+        ];
+    }
+
+    return [
+        'type' => 'done', 'status' => $row['status'],
+        'time_in' => substr((string)$row['time_in'], 0, 5), 'time_out' => substr((string)$row['time_out'], 0, 5),
+        'message' => 'You have already clocked in and out today.',
+    ];
 }
 
 // ---------------------------------------------------------------
