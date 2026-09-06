@@ -143,9 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <select id="role" name="role" required>
             <option value="" disabled <?= $roleName === '' ? 'selected' : '' ?>>Select a role&hellip;</option>
             <?php foreach ($roles as $r): ?>
-              <option value="<?= e($r['role_name']) ?>"<?= $roleName === $r['role_name'] ? ' selected' : '' ?>>
-                <?= e(ucfirst($r['role_name'])) ?> &mdash; <?= e($r['description']) ?>
-              </option>
+              <option value="<?= e($r['role_name']) ?>"<?= $roleName === $r['role_name'] ? ' selected' : '' ?>><?= e(ucfirst($r['role_name'])) ?></option>
             <?php endforeach; ?>
           </select>
           <span class="hint">This decides which parts of PayPro you can open after signing in.</span>
