@@ -214,8 +214,8 @@ include __DIR__ . '/includes/header.php';
     data: {
       labels: <?= json_encode(array_map(fn($t) => substr(month_name((int)$t['period_month']), 0, 3) . ' ' . $t['period_year'], $trend)) ?>,
       datasets: [
-        { label: 'Gross pay', data: <?= json_encode(array_map(fn($t) => (float)$t['gross'], $trend)) ?>, backgroundColor: '#0b6e5a' },
-        { label: 'Performance bonus', data: <?= json_encode(array_map(fn($t) => (float)$t['bonus'], $trend)) ?>, backgroundColor: '#a86b12' }
+        { label: 'Gross pay', data: <?= json_encode(array_map(fn($t) => (float)$t['gross'], $trend)) ?>, backgroundColor: '#f8923c' },
+        { label: 'Performance bonus', data: <?= json_encode(array_map(fn($t) => (float)$t['bonus'], $trend)) ?>, backgroundColor: '#1f2937' }
       ]
     },
     options: {
