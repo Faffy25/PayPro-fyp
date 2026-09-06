@@ -5,13 +5,22 @@ if (is_logged_in()) redirect('index.php');
 
 $username = '';
 $email    = '';
+$roleName = '';
 $errors   = [];
+
+// Roles a person may pick when registering, in menu order.
+$roles = $pdo->query(
+    "SELECT role_id, role_name, description FROM roles
+     ORDER BY FIELD(role_name,'admin','hr','manager','employee'), role_name"
+)->fetchAll();
+$roleIds = array_column($roles, 'role_id', 'role_name');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
 
     $username = trim($_POST['username'] ?? '');
     $email    = trim($_POST['email'] ?? '');
+    $roleName = $_POST['role'] ?? '';
     $password = $_POST['password'] ?? '';
     $confirm  = $_POST['confirm'] ?? '';
 
@@ -20,6 +29,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errors[] = 'Enter a valid email address.';
+    }
+    if (!isset($roleIds[$roleName])) {
+        $errors[] = 'Choose the role for this account.';
     }
     if (strlen($password) < 8 || !preg_match('/[A-Za-z]/', $password) || !preg_match('/\d/', $password)) {
         $errors[] = 'Password must be at least 8 characters and include a letter and a number.';
@@ -40,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (!$errors) {
-        $roleId = (int)$pdo->query("SELECT role_id FROM roles WHERE role_name = 'employee' LIMIT 1")->fetchColumn();
+        $roleId = (int)$roleIds[$roleName];
         try {
             $stmt = $pdo->prepare(
                 'INSERT INTO users (employee_id, username, email, password_hash, role_id, status)
@@ -55,11 +67,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
             $newId = (int)$pdo->lastInsertId();
 
-            log_action('REGISTER', 'Authentication', $newId, 'Self-registered account "' . $username . '"');
+            log_action('REGISTER', 'Authentication', $newId, 'Self-registered account "' . $username . '" as ' . $roleName);
             notify_roles(
                 ['admin', 'hr'],
                 'New account registered',
-                $username . ' (' . $email . ') created an account and needs a staff record linked.',
+                $username . ' (' . $email . ') registered as ' . $roleName . ' and needs a staff record linked.',
                 url('modules/users/index.php')
             );
 
@@ -125,6 +137,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="field">
           <label for="email">Work email</label>
           <input type="email" id="email" name="email" value="<?= e($email) ?>" required>
+        </div>
+        <div class="field">
+          <label for="role">Role</label>
+          <select id="role" name="role" required>
+            <option value="" disabled <?= $roleName === '' ? 'selected' : '' ?>>Select a role&hellip;</option>
+            <?php foreach ($roles as $r): ?>
+              <option value="<?= e($r['role_name']) ?>"<?= $roleName === $r['role_name'] ? ' selected' : '' ?>>
+                <?= e(ucfirst($r['role_name'])) ?> &mdash; <?= e($r['description']) ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+          <span class="hint">This decides which parts of PayPro you can open after signing in.</span>
         </div>
         <div class="field">
           <label for="password">Password</label>
