@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
 
-    // Simple throttle: five failures locks the form for two minutes.
+    // Simple throttle: five failures locks the form f
     $lock = $_SESSION['lock_until'] ?? 0;
     if ($lock > time()) {
         set_flash('error', 'Too many failed attempts. Try again in ' . ($lock - time()) . ' seconds.');
@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="auth-page">
   <section class="auth-brand">
     <div class="mark"><?= APP_NAME ?></div>
-    <p>Appraisals, attendance and payroll in one place, so a rating earned this quarter shows up on next month&rsquo;s payslip.</p>
+    <p class="tagline">Appraisals, attendance and payroll in one place, so a rating earned this quarter shows up on next month&rsquo;s payslip.</p>
     <ul>
       <li>Staff records, contracts and salary structure</li>
       <li>Attendance capture and leave approval</li>
@@ -78,12 +78,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <li>Payroll with PAYE, AIDS levy and NSSA</li>
       <li>Audit trail of every change</li>
     </ul>
+    <div class="statutory">
+      <span>PAYE</span><span>AIDS levy</span><span>NSSA</span><span>Audit trail</span>
+    </div>
   </section>
 
   <section class="auth-panel">
     <div class="auth-card">
+      <div class="mobile-mark"><?= APP_NAME ?></div>
       <h1>Sign in</h1>
-      <p>Use the account issued by your administrator.</p>
+      <p class="lead">Welcome back. Enter your details to continue.</p>
 
       <?php foreach (get_flashes() as $f): ?>
         <div class="alert <?= e($f['type']) ?>"><?= $f['message'] ?></div>
@@ -97,20 +101,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <div class="field">
           <label for="password">Password</label>
-          <input type="password" id="password" name="password" required>
+          <div class="pw-wrap">
+            <input type="password" id="password" name="password" required>
+            <button type="button" class="pw-toggle" data-toggle="#password">Show</button>
+          </div>
         </div>
-        <button class="btn" type="submit" style="width:100%;justify-content:center">Sign in</button>
+        <button class="btn block" type="submit">Sign in</button>
       </form>
 
-      <div class="demo-accounts">
-        <strong>Demo accounts</strong> &mdash; password <code>Password@123</code><br>
-        <code>admin</code> administrator &middot;
-        <code>hr.kudzai</code> HR &middot;
-        <code>mgr.tendai</code> manager &middot;
-        <code>emp.rutendo</code> employee
+      <div class="auth-divider">New to <?= APP_NAME ?>?</div>
+      <div class="auth-alt">
+        <p>Don&rsquo;t have an account yet?</p>
+        <a class="btn secondary block" href="<?= url('register.php') ?>">Create an account</a>
       </div>
+
+      <div class="auth-foot"><?= APP_LONG_NAME ?></div>
     </div>
   </section>
 </div>
+<script>
+document.querySelectorAll('.pw-toggle').forEach(function (b) {
+  b.addEventListener('click', function () {
+    var i = document.querySelector(b.dataset.toggle);
+    if (!i) return;
+    var show = i.type === 'password';
+    i.type = show ? 'text' : 'password';
+    b.textContent = show ? 'Hide' : 'Show';
+  });
+});
+</script>
 </body>
 </html>

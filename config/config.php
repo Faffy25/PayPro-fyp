@@ -1,22 +1,16 @@
 <?php
-/**
- * Core configuration, PDO connection and session bootstrap.
- * Edit the four DB_* constants to match your server.
- */
 
-// ---------- Database ----------
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'paypro_db');
+define('DB_NAME', 'paypro_hrms');
 define('DB_USER', 'root');
-define('DB_PASS', '');          // XAMPP default is an empty password
+define('DB_PASS', '');          
 
-// ---------- Application ----------
+
 define('APP_NAME', 'PayPro');
 define('APP_LONG_NAME', 'Employee Performance & Payroll Management System');
 define('APP_ROOT', dirname(__DIR__));
 
-// Work out the URL the app is served from (e.g. /paypro) so links work
-// whether the project sits at the web root or inside htdocs/paypro.
+
 $docRoot  = rtrim(str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT'] ?? ''), '/');
 $appPath  = str_replace('\\', '/', APP_ROOT);
 $basePath = ($docRoot && strpos($appPath, $docRoot) === 0)
@@ -26,13 +20,13 @@ define('BASE_URL', rtrim($basePath, '/'));
 
 date_default_timezone_set('Africa/Harare');
 
-// ---------- Session ----------
+
 if (session_status() === PHP_SESSION_NONE) {
     session_set_cookie_params(['httponly' => true, 'samesite' => 'Lax']);
     session_start();
 }
 
-// ---------- PDO ----------
+
 try {
     $pdo = new PDO(
         'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4',

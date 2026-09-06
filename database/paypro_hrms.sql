@@ -1,16 +1,9 @@
--- =====================================================================
--- Employee Performance & Payroll Management System (PayPro)
--- MySQL 5.7+ / MariaDB 10.4+  (XAMPP / WAMP friendly)
--- Import this file first:  mysql -u root -p < paypro_db.sql
--- =====================================================================
 
-DROP DATABASE IF EXISTS paypro_db;
-CREATE DATABASE paypro_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE paypro_db;
 
--- ---------------------------------------------------------------
--- 1. SYSTEM ADMINISTRATION / USER MANAGEMENT
--- ---------------------------------------------------------------
+DROP DATABASE IF EXISTS paypro_hrms;
+CREATE DATABASE paypro_hrms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE paypro_hrms;
+
 CREATE TABLE roles (
   role_id      INT AUTO_INCREMENT PRIMARY KEY,
   role_name    VARCHAR(30) NOT NULL UNIQUE,
