@@ -62,6 +62,7 @@ include APP_ROOT . '/includes/header.php';
     <div class="panel-head">
       <h2>Clocked in today</h2>
       <div class="spacer"></div>
+      <a class="btn secondary small no-print" href="<?= url('modules/attendance/download.php?date=' . $today) ?>">Download Excel</a>
       <a class="btn secondary small no-print" href="<?= url('modules/attendance/qr.php') ?>">Refresh</a>
     </div>
     <div class="table-wrap">

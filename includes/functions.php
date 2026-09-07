@@ -221,15 +221,27 @@ function mark_attendance_scan(array $emp): array {
     $stmt->execute([$emp['employee_id']]);
     $row = $stmt->fetch();
 
+    $who   = trim($emp['first_name'] . ' ' . $emp['last_name']);
+    $stamp = date('H:i');
+    $link  = 'modules/attendance/qr.php';
+
     if (!$row) {
         $status = (int)date('H') >= 9 ? 'Late' : 'Present';
         $pdo->prepare('INSERT INTO attendance (employee_id, work_date, time_in, status) VALUES (?, CURDATE(), CURTIME(), ?)')
             ->execute([$emp['employee_id'], $status]);
-        log_action('CREATE', 'Attendance', (int)$pdo->lastInsertId(), 'QR clock-in at ' . date('H:i'));
+        log_action('CREATE', 'Attendance', (int)$pdo->lastInsertId(), 'QR clock-in at ' . $stamp);
+        notify_roles(
+            ['hr', 'admin'],
+            ($status === 'Late' ? 'Late clock-in: ' : 'Clock-in: ') . $who,
+            $who . ' (' . $emp['emp_number'] . ') clocked in at ' . $stamp
+                . ($status === 'Late' ? ', recorded as late.' : '.'),
+            $link
+        );
+        attendance_register_build(date('Y-m-d'));
         return [
             'type' => 'in', 'status' => $status,
-            'time_in' => date('H:i'), 'time_out' => null,
-            'message' => 'Clocked in at ' . date('H:i') . ($status === 'Late' ? ' — recorded as late.' : '.'),
+            'time_in' => $stamp, 'time_out' => null,
+            'message' => 'Clocked in at ' . $stamp . ($status === 'Late' ? ' — recorded as late.' : '.'),
         ];
     }
 
@@ -240,11 +252,19 @@ function mark_attendance_scan(array $emp): array {
         $pdo->prepare('UPDATE attendance SET time_out = CURTIME(), hours_worked = ?, overtime_hours = ? WHERE attendance_id = ?')
             ->execute([$hours, $overtime, $row['attendance_id']]);
         log_action('UPDATE', 'Attendance', (int)$row['attendance_id'], 'QR clock-out after ' . $hours . ' hours');
+        notify_roles(
+            ['hr', 'admin'],
+            'Clock-out: ' . $who,
+            $who . ' (' . $emp['emp_number'] . ') clocked out at ' . $stamp . ' — ' . $hours . ' hours'
+                . ($overtime ? ', including ' . $overtime . ' overtime.' : '.'),
+            $link
+        );
+        attendance_register_build(date('Y-m-d'));
         return [
             'type' => 'out', 'status' => $row['status'],
-            'time_in' => substr((string)$row['time_in'], 0, 5), 'time_out' => date('H:i'),
+            'time_in' => substr((string)$row['time_in'], 0, 5), 'time_out' => $stamp,
             'hours' => $hours, 'overtime' => $overtime,
-            'message' => 'Clocked out at ' . date('H:i') . '. ' . $hours . ' hours recorded'
+            'message' => 'Clocked out at ' . $stamp . '. ' . $hours . ' hours recorded'
                        . ($overtime ? ', including ' . $overtime . ' overtime.' : '.'),
         ];
     }
@@ -254,6 +274,99 @@ function mark_attendance_scan(array $emp): array {
         'time_in' => substr((string)$row['time_in'], 0, 5), 'time_out' => substr((string)$row['time_out'], 0, 5),
         'message' => 'You have already clocked in and out today.',
     ];
+}
+
+/** Folder that holds the generated daily attendance workbooks. */
+function attendance_register_dir(): string {
+    $dir = APP_ROOT . '/storage/attendance';
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0775, true);
+    }
+    return $dir;
+}
+
+/** Full path of the Excel workbook for a given day (file may not exist yet). */
+function attendance_register_path(string $date): string {
+    $date = preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) ? $date : date('Y-m-d');
+    return attendance_register_dir() . '/attendance-' . $date . '.xls';
+}
+
+/**
+ * Write (or rewrite) the Microsoft Excel register of everyone who clocked
+ * in on $date, straight from the attendance table. Returns the file path.
+ *
+ * The file is SpreadsheetML 2003 — a plain-XML workbook Excel opens
+ * natively, so no PHP zip/spreadsheet extension is needed.
+ */
+function attendance_register_build(string $date): string {
+    global $pdo;
+    $date = preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) ? $date : date('Y-m-d');
+
+    $stmt = $pdo->prepare(
+        "SELECT e.emp_number, CONCAT(e.first_name, ' ', e.last_name) AS name,
+                COALESCE(d.dept_name, '-') AS dept,
+                a.time_in, a.time_out, a.hours_worked, a.overtime_hours, a.status,
+                COALESCE(a.remarks, '') AS remarks
+         FROM attendance a
+         JOIN employees e        ON e.employee_id = a.employee_id
+         LEFT JOIN departments d ON d.department_id = e.department_id
+         WHERE a.work_date = ?
+         ORDER BY a.time_in IS NULL, a.time_in, e.emp_number"
+    );
+    $stmt->execute([$date]);
+    $rows = $stmt->fetchAll();
+
+    $header = ['Employee #', 'Name', 'Department', 'Clock in', 'Clock out', 'Hours', 'Overtime', 'Status', 'Remarks'];
+    $company = setting('company_name', 'Company');
+    $title   = $company . ' — Attendance register for ' . date('l, j F Y', strtotime($date));
+
+    $cell = function ($v, string $type = 'String'): string {
+        return '<Cell><Data ss:Type="' . $type . '">' . e($v) . '</Data></Cell>';
+    };
+
+    $xml  = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+    $xml .= '<?mso-application progid="Excel.Sheet"?>' . "\n";
+    $xml .= '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"'
+          . ' xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">' . "\n";
+    $xml .= '<Styles>'
+          . '<Style ss:ID="ttl"><Font ss:Bold="1" ss:Size="12"/></Style>'
+          . '<Style ss:ID="hdr"><Font ss:Bold="1"/>'
+          . '<Interior ss:Color="#FFF7ED" ss:Pattern="Solid"/>'
+          . '<Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/></Borders>'
+          . '</Style></Styles>' . "\n";
+    $xml .= '<Worksheet ss:Name="Attendance"><Table>' . "\n";
+    $xml .= '<Row><Cell ss:StyleID="ttl"><Data ss:Type="String">' . e($title) . '</Data></Cell></Row>' . "\n";
+    $xml .= '<Row></Row>' . "\n";
+
+    $xml .= '<Row>';
+    foreach ($header as $h) {
+        $xml .= '<Cell ss:StyleID="hdr"><Data ss:Type="String">' . e($h) . '</Data></Cell>';
+    }
+    $xml .= '</Row>' . "\n";
+
+    foreach ($rows as $r) {
+        $xml .= '<Row>'
+              . $cell($r['emp_number'])
+              . $cell($r['name'])
+              . $cell($r['dept'])
+              . $cell(substr((string)$r['time_in'], 0, 5) ?: '-')
+              . $cell(substr((string)$r['time_out'], 0, 5) ?: '-')
+              . $cell((float)$r['hours_worked'], 'Number')
+              . $cell((float)$r['overtime_hours'], 'Number')
+              . $cell($r['status'])
+              . $cell($r['remarks'])
+              . '</Row>' . "\n";
+    }
+
+    if (!$rows) {
+        $xml .= '<Row><Cell><Data ss:Type="String">No one has clocked in yet.</Data></Cell></Row>' . "\n";
+    }
+
+    $xml .= '</Table></Worksheet></Workbook>' . "\n";
+
+    $path = attendance_register_path($date);
+    file_put_contents($path, $xml, LOCK_EX);
+    return $path;
 }
 
 // ---------------------------------------------------------------

@@ -1,0 +1,6 @@
+# Generated at runtime
+/storage/
+
+# Stray local artifacts
+/modules.zip
+/PayPro/
