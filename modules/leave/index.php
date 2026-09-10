@@ -179,6 +179,15 @@ include APP_ROOT . '/includes/header.php';
     <div class="form-actions"><button class="btn">Submit application</button></div>
   </form>
 </section>
+<?php else: ?>
+<div class="panel empty">
+  <h2>No leave form for this account</h2>
+  <p>
+    <?= $isOfficer
+        ? 'This account is not linked to an employee record, so there is nothing to apply for. You can still review the requests below.'
+        : 'This account is not linked to an employee record. Ask HR to link it before you can apply for leave.' ?>
+  </p>
+</div>
 <?php endif; ?>
 
 <section class="panel">
