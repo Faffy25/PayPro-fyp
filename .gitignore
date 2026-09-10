@@ -1,3 +1,6 @@
+# Local machine overrides (DB credentials etc.)
+/config/config.local.php
+
 # Generated at runtime
 /storage/
 
