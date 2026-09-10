@@ -37,10 +37,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($emp['email'] !== '' && !filter_var($emp['email'], FILTER_VALIDATE_EMAIL)) $errors[] = 'That email address is not valid.';
     if (!is_numeric($emp['basic_salary']) || $emp['basic_salary'] < 0) $errors[] = 'Basic salary must be a positive number.';
 
-    // Employee number and national ID must stay unique.
-    $dupe = $pdo->prepare('SELECT COUNT(*) FROM employees WHERE emp_number = ? AND employee_id <> ?');
-    $dupe->execute([$emp['emp_number'], $id]);
-    if ($dupe->fetchColumn()) $errors[] = 'That employee number is already in use.';
+    // Employee number, national ID and email must each stay unique.
+    foreach (['emp_number' => 'employee number', 'national_id' => 'national ID', 'email' => 'email address'] as $col => $label) {
+        if ($emp[$col] === '') continue;
+        $dupe = $pdo->prepare("SELECT COUNT(*) FROM employees WHERE $col = ? AND employee_id <> ?");
+        $dupe->execute([$emp[$col], $id]);
+        if ($dupe->fetchColumn()) $errors[] = "That $label is already in use by another employee.";
+    }
 
     if (!$errors) {
         $fields = ['emp_number','first_name','last_name','national_id','date_of_birth','gender','email','phone',
@@ -53,23 +56,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $values[] = ($v === '' && in_array($f, ['department_id','position_id','manager_id','date_of_birth','national_id'], true)) ? null : $v;
         }
 
-        if ($id) {
-            $set = implode(' = ?, ', $fields) . ' = ?';
-            $stmt = $pdo->prepare("UPDATE employees SET $set WHERE employee_id = ?");
-            $values[] = $id;
-            $stmt->execute($values);
-            log_action('UPDATE', 'Employees', $id, 'Updated record for ' . $emp['first_name'] . ' ' . $emp['last_name']);
-            set_flash('success', 'Employee record updated.');
-        } else {
-            $cols  = implode(',', $fields);
-            $marks = implode(',', array_fill(0, count($fields), '?'));
-            $pdo->prepare("INSERT INTO employees ($cols) VALUES ($marks)")->execute($values);
-            $id = (int)$pdo->lastInsertId();
-            log_action('CREATE', 'Employees', $id, 'Added ' . $emp['first_name'] . ' ' . $emp['last_name']);
-            notify_roles(['hr'], 'New employee added', $emp['first_name'] . ' ' . $emp['last_name'] . ' joined the register.');
-            set_flash('success', 'Employee added.');
+        try {
+            if ($id) {
+                $set = implode(' = ?, ', $fields) . ' = ?';
+                $stmt = $pdo->prepare("UPDATE employees SET $set WHERE employee_id = ?");
+                $values[] = $id;
+                $stmt->execute($values);
+                log_action('UPDATE', 'Employees', $id, 'Updated record for ' . $emp['first_name'] . ' ' . $emp['last_name']);
+                set_flash('success', 'Employee record updated.');
+            } else {
+                $cols  = implode(',', $fields);
+                $marks = implode(',', array_fill(0, count($fields), '?'));
+                $pdo->prepare("INSERT INTO employees ($cols) VALUES ($marks)")->execute($values);
+                $id = (int)$pdo->lastInsertId();
+                log_action('CREATE', 'Employees', $id, 'Added ' . $emp['first_name'] . ' ' . $emp['last_name']);
+                notify_roles(['hr'], 'New employee added', $emp['first_name'] . ' ' . $emp['last_name'] . ' joined the register.');
+                set_flash('success', 'Employee added.');
+            }
+            redirect('modules/employees/view.php?id=' . $id);
+        } catch (PDOException $e) {
+            $errors[] = (($e->errorInfo[1] ?? 0) === 1062)
+                ? 'Another employee already uses that employee number, national ID or email. Check those fields and try again.'
+                : 'The record could not be saved. Please check the details and try again.';
         }
-        redirect('modules/employees/view.php?id=' . $id);
     }
 }
 
