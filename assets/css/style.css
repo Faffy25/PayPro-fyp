@@ -1,28 +1,28 @@
 /* ==========================================================
    PayPro stylesheet
    A payroll ledger read on screen: hairline rules, aligned
-   figures, one warm amber for money and action.
+   figures, teal and sapphire for money and action.
    ========================================================== */
 
 :root {
-  --ink:        #1f2937;
-  --ink-soft:   #33404f;
-  --paper:      #fff7ed;
+  --ink:        #063154;  /* Sapphire */
+  --ink-soft:   #0a4468;
+  --paper:      #f7f6f2;  /* Alabaster */
   --surface:    #ffffff;
-  --line:       #ecdcc8;
-  --line-soft:  #f4e8da;
-  --text:       #1f2937;
-  --muted:      #877c6d;
-  --brand:      #f8923c;
-  --brand-dark: #e17a24;
-  --brand-soft: #fdba74;
-  --brand-tint: #ffedd5;
+  --line:       #bcc5cc;  /* Heather */
+  --line-soft:  #dee2e6;
+  --text:       #063154;  /* Sapphire */
+  --muted:      #5e7b90;
+  --brand:      #2f9d94;  /* Scooter */
+  --brand-dark: #025f67;  /* Blue Lagoon */
+  --brand-soft: #7fc4be;
+  --brand-tint: #eaf5f4;
   --gold:       #a16207;
   --gold-tint:  #fef6df;
   --red:        #a92a20;
   --red-tint:   #fbe7e5;
-  --blue:       #23557f;
-  --blue-tint:  #e3edf6;
+  --blue:       #025f67;  /* Blue Lagoon */
+  --blue-tint:  #dce9ea;
   --radius:     6px;
   --sidebar-w:  238px;
 }
@@ -61,11 +61,11 @@ a:hover { text-decoration: underline; }
   position: relative;
   overflow: hidden;
   padding: 4rem 3.75rem;
-  color: #ece0d1;
+  color: #dce6ec;
   display: flex; flex-direction: column; justify-content: center;
   background:
-    radial-gradient(680px 420px at 12% 8%, rgba(248,146,60,.34), transparent 70%),
-    radial-gradient(560px 380px at 90% 100%, rgba(253,186,116,.20), transparent 70%),
+    radial-gradient(680px 420px at 12% 8%, rgba(47,157,148,.34), transparent 70%),
+    radial-gradient(560px 380px at 90% 100%, rgba(2,95,103,.30), transparent 70%),
     var(--ink);
 }
 /* faint ledger rules behind the brand copy */
@@ -83,21 +83,21 @@ a:hover { text-decoration: underline; }
 .auth-brand .mark::before {
   content: ''; width: 12px; height: 12px; align-self: center; margin-right: .55rem;
   border-radius: 3px; background: var(--brand);
-  box-shadow: 0 0 0 4px rgba(248,146,60,.28);
+  box-shadow: 0 0 0 4px rgba(47,157,148,.28);
 }
 .auth-brand .tagline {
-  margin-top: 1.1rem; color: #c8bba7; max-width: 44ch; font-size: 1.02rem; line-height: 1.6;
+  margin-top: 1.1rem; color: #b7c9d3; max-width: 44ch; font-size: 1.02rem; line-height: 1.6;
 }
 .auth-brand ul { list-style: none; padding: 0; margin: 2.25rem 0 0; display: grid; gap: .1rem; }
 .auth-brand li {
   padding: .7rem 0 .7rem 2rem; position: relative;
-  border-top: 1px solid rgba(255,255,255,.09); color: #d9ccba; font-size: .95rem;
+  border-top: 1px solid rgba(255,255,255,.09); color: #c7d6de; font-size: .95rem;
 }
 .auth-brand li:last-child { border-bottom: 1px solid rgba(255,255,255,.09); }
 .auth-brand li::before {
   content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
   width: 18px; height: 18px; border-radius: 50%;
-  background: rgba(248,146,60,.92);
+  background: rgba(47,157,148,.92);
 }
 .auth-brand li::after {
   content: ''; position: absolute; left: 6px; top: 50%;
@@ -109,7 +109,7 @@ a:hover { text-decoration: underline; }
 }
 .auth-brand .statutory span {
   font-size: .74rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
-  color: #b6a691; padding: .3rem .6rem; border: 1px solid rgba(255,255,255,.14); border-radius: 20px;
+  color: #9fb4c0; padding: .3rem .6rem; border: 1px solid rgba(255,255,255,.14); border-radius: 20px;
 }
 
 .auth-panel { background: var(--surface); display: flex; align-items: safe center; justify-content: center; padding: 2.5rem 2rem; overflow-y: auto; }
@@ -157,7 +157,7 @@ a:hover { text-decoration: underline; }
   width: var(--sidebar-w);
   flex: 0 0 var(--sidebar-w);
   background: var(--ink);
-  color: #c9beb0;
+  color: #b7c9d3;
   position: sticky; top: 0; height: 100vh; overflow-y: auto;
 }
 .sidebar .logo {
@@ -165,16 +165,16 @@ a:hover { text-decoration: underline; }
   border-bottom: 1px solid rgba(255,255,255,.08);
 }
 .sidebar .logo strong { display: block; color: #fff; font-size: 1.15rem; letter-spacing: -0.02em; }
-.sidebar .logo span { font-size: .74rem; color: #9a8b78; }
+.sidebar .logo span { font-size: .74rem; color: #8fa3b0; }
 .sidebar nav { padding: .75rem 0 2rem; }
-.nav-group { padding: 1rem 1.25rem .35rem; font-size: .74rem; color: #928473; }
+.nav-group { padding: 1rem 1.25rem .35rem; font-size: .74rem; color: #7e93a0; }
 .sidebar a {
   display: flex; align-items: center; gap: .6rem;
-  padding: .5rem 1.25rem; color: #c9beb0; font-size: .92rem;
+  padding: .5rem 1.25rem; color: #b7c9d3; font-size: .92rem;
   border-left: 3px solid transparent;
 }
 .sidebar a:hover { background: rgba(255,255,255,.05); color: #fff; text-decoration: none; }
-.sidebar a.active { background: rgba(248,146,60,.18); border-left-color: var(--brand); color: #fff; font-weight: 600; }
+.sidebar a.active { background: rgba(47,157,148,.22); border-left-color: var(--brand); color: #fff; font-weight: 600; }
 .sidebar a .ic { width: 18px; text-align: center; opacity: .85; }
 
 .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
@@ -229,14 +229,14 @@ table.data { width: 100%; border-collapse: collapse; font-size: .9rem; }
 table.data th {
   text-align: left; font-weight: 600; color: var(--muted); font-size: .8rem;
   padding: .6rem 1.1rem; border-bottom: 1px solid var(--line);
-  white-space: nowrap; background: #fdf4e9;
+  white-space: nowrap; background: #f2f4f5;
 }
 table.data td { padding: .65rem 1.1rem; border-bottom: 1px solid var(--line-soft); vertical-align: middle; }
 table.data tr:last-child td { border-bottom: 0; }
-table.data tbody tr:hover { background: #fefaf3; }
+table.data tbody tr:hover { background: #f8f9fa; }
 table.data .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 table.data .strong { font-weight: 600; }
-table.data tfoot td { font-weight: 600; border-top: 2px solid var(--line); background: #fdf4e9; }
+table.data tfoot td { font-weight: 600; border-top: 2px solid var(--line); background: #f2f4f5; }
 .row-actions { display: flex; gap: .4rem; justify-content: flex-end; }
 
 /* ---------- Metrics ---------- */
@@ -308,7 +308,7 @@ legend { padding: 0 .4rem; font-weight: 600; font-size: .9rem; }
   background: var(--surface); border-radius: var(--radius);
   padding: .7rem .9rem; margin-bottom: 1rem; font-size: .9rem;
 }
-.alert.success { border-left-color: var(--brand); background: var(--brand-tint); border-color: #f6d9b8; }
+.alert.success { border-left-color: var(--brand); background: var(--brand-tint); border-color: #c2e2de; }
 .alert.error   { border-left-color: var(--red);   background: var(--red-tint);   border-color: #f0cdc9; }
 .alert.info    { border-left-color: var(--blue);  background: var(--blue-tint);  border-color: #ccdff0; }
 .alert.warning { border-left-color: var(--gold);  background: var(--gold-tint);  border-color: #f2e2b0; }
@@ -323,7 +323,7 @@ legend { padding: 0 .4rem; font-weight: 600; font-size: .9rem; }
 .progress span { display: block; height: 100%; background: var(--brand); }
 
 .notif-item { padding: .75rem 1.1rem; border-bottom: 1px solid var(--line-soft); display: flex; gap: .75rem; }
-.notif-item.unread { background: #fff3e4; }
+.notif-item.unread { background: #eaf5f4; }
 .notif-item .when { color: var(--muted); font-size: .78rem; white-space: nowrap; }
 
 /* ---------- Payslip ---------- */
@@ -333,7 +333,7 @@ legend { padding: 0 .4rem; font-weight: 600; font-size: .9rem; }
 .payslip .meta { display: grid; grid-template-columns: repeat(4, 1fr); gap: .75rem 1rem; margin-bottom: 1.5rem; }
 .payslip .meta div span { display: block; font-size: .76rem; color: var(--muted); }
 .payslip .totals { display: flex; justify-content: flex-end; margin-top: 1.25rem; }
-.payslip .netbox { background: var(--brand-tint); border: 1px solid #f6d9b8; border-radius: var(--radius); padding: .8rem 1.4rem; text-align: right; }
+.payslip .netbox { background: var(--brand-tint); border: 1px solid #c2e2de; border-radius: var(--radius); padding: .8rem 1.4rem; text-align: right; }
 .payslip .netbox .value { font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--brand-dark); }
 
 /* ---------- Responsive ---------- */
