@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 <div class="auth-page">
   <section class="auth-brand">
-    <div class="mark"><?= APP_NAME ?></div>
+    <a class="mark" href="<?= url('welcome.php') ?>" style="color:inherit;text-decoration:none"><?= APP_NAME ?></a>
     <p class="tagline">Appraisals, attendance and payroll in one place, so a rating earned this quarter shows up on next month&rsquo;s payslip.</p>
     <ul>
       <li>Staff records, contracts and salary structure</li>
@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   <section class="auth-panel">
     <div class="auth-card">
-      <div class="mobile-mark"><?= APP_NAME ?></div>
+      <a class="mobile-mark" href="<?= url('welcome.php') ?>" style="color:inherit;text-decoration:none;display:block"><?= APP_NAME ?></a>
       <h1>Sign in</h1>
       <p class="lead">Welcome back. Enter your details to continue.</p>
 

@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 <div class="auth-page">
   <section class="auth-brand">
-    <div class="mark"><?= APP_NAME ?></div>
+    <a class="mark" href="<?= url('welcome.php') ?>" style="color:inherit;text-decoration:none"><?= APP_NAME ?></a>
     <p class="tagline">One account for your payslips, attendance, leave requests and performance reviews.</p>
     <ul>
       <li>See every payslip the moment it is issued</li>
@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   <section class="auth-panel">
     <div class="auth-card">
-      <div class="mobile-mark"><?= APP_NAME ?></div>
+      <a class="mobile-mark" href="<?= url('welcome.php') ?>" style="color:inherit;text-decoration:none;display:block"><?= APP_NAME ?></a>
       <h1>Create an account</h1>
       <p class="lead">Set up self-service access. HR will link your staff record.</p>
 

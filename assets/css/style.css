@@ -336,6 +336,73 @@ legend { padding: 0 .4rem; font-weight: 600; font-size: .9rem; }
 .payslip .netbox { background: var(--brand-tint); border: 1px solid #c2e2de; border-radius: var(--radius); padding: .8rem 1.4rem; text-align: right; }
 .payslip .netbox .value { font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--brand-dark); }
 
+/* ---------- Landing ---------- */
+.landing-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 1.75rem; border-bottom: 1px solid var(--line);
+  background: var(--surface); position: sticky; top: 0; z-index: 20;
+}
+.landing-nav .mark {
+  display: inline-flex; align-items: center; gap: .55rem;
+  font-size: 1.25rem; font-weight: 700; color: var(--ink); letter-spacing: -0.02em;
+}
+.landing-nav .mark::before {
+  content: ''; width: 11px; height: 11px; border-radius: 3px; background: var(--brand);
+}
+.landing-nav nav { display: flex; align-items: center; gap: .6rem; }
+
+.landing-hero {
+  position: relative; overflow: hidden;
+  padding: 5rem 1.75rem 4.5rem; text-align: center;
+  background:
+    radial-gradient(720px 420px at 50% -10%, var(--brand-tint), transparent 70%),
+    var(--paper);
+}
+.landing-hero .eyebrow {
+  display: inline-block; font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--brand-dark); background: var(--brand-tint); padding: .3rem .75rem; border-radius: 20px; margin-bottom: 1.25rem;
+}
+.landing-hero h1 { font-size: 2.5rem; max-width: 18ch; margin: 0 auto .9rem; letter-spacing: -0.03em; }
+.landing-hero p.lead { max-width: 56ch; margin: 0 auto 2rem; color: var(--muted); font-size: 1.08rem; }
+.landing-hero .cta { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2.5rem; }
+.landing-chips { display: flex; gap: .5rem; justify-content: center; flex-wrap: wrap; }
+.landing-chips span {
+  font-size: .76rem; font-weight: 600; color: var(--muted); background: var(--surface);
+  border: 1px solid var(--line); padding: .3rem .65rem; border-radius: 20px;
+}
+
+.landing-features { padding: 4rem 1.75rem; max-width: 1080px; margin: 0 auto; }
+.landing-features h2 { text-align: center; font-size: 1.6rem; margin-bottom: .4rem; }
+.landing-features > p.sub { text-align: center; color: var(--muted); max-width: 52ch; margin: 0 auto 2.5rem; }
+.landing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1.25rem; }
+.landing-card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 1.4rem 1.25rem; border-top: 3px solid var(--brand);
+}
+.landing-card .ic {
+  width: 38px; height: 38px; border-radius: 9px; background: var(--brand-tint); color: var(--brand-dark);
+  display: grid; place-items: center; font-size: 1.15rem; margin-bottom: .85rem;
+}
+.landing-card h3 { margin-bottom: .35rem; font-size: 1.02rem; }
+.landing-card p { color: var(--muted); font-size: .89rem; margin: 0; }
+
+.landing-band { background: var(--ink); color: #dce6ec; text-align: center; padding: 3.5rem 1.75rem; }
+.landing-band h2 { color: #fff; font-size: 1.6rem; margin-bottom: .5rem; }
+.landing-band p { color: #b7c9d3; max-width: 46ch; margin: 0 auto 1.75rem; }
+.landing-band .cta { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; }
+.landing-band .btn.secondary { background: transparent; color: #fff; border-color: rgba(255,255,255,.35); }
+.landing-band .btn.secondary:hover { background: rgba(255,255,255,.08); color: #fff; }
+
+.landing-foot {
+  padding: 1.5rem 1.75rem; text-align: center; font-size: .82rem; color: var(--muted);
+  border-top: 1px solid var(--line-soft); background: var(--surface);
+}
+
+@media (max-width: 640px) {
+  .landing-hero h1 { font-size: 1.9rem; }
+  .landing-nav nav .btn.secondary { display: none; }
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 980px) {
   .grid-2, .grid-3 { grid-template-columns: 1fr; }
