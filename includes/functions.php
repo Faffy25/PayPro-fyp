@@ -331,7 +331,7 @@ function attendance_register_build(string $date): string {
     $xml .= '<Styles>'
           . '<Style ss:ID="ttl"><Font ss:Bold="1" ss:Size="12"/></Style>'
           . '<Style ss:ID="hdr"><Font ss:Bold="1"/>'
-          . '<Interior ss:Color="#FFF7ED" ss:Pattern="Solid"/>'
+          . '<Interior ss:Color="#EAF5F4" ss:Pattern="Solid"/>'
           . '<Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/></Borders>'
           . '</Style></Styles>' . "\n";
     $xml .= '<Worksheet ss:Name="Attendance"><Table>' . "\n";
