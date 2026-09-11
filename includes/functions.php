@@ -14,6 +14,17 @@ function url(string $path = ''): string {
     return BASE_URL . '/' . ltrim($path, '/');
 }
 
+/**
+ * Same as url(), but appends the file's last-modified time as a version
+ * string, so browsers fetch a fresh copy the moment CSS/JS changes
+ * instead of serving a stale one from cache.
+ */
+function asset_url(string $path): string {
+    $full = APP_ROOT . '/' . ltrim($path, '/');
+    $v    = is_file($full) ? filemtime($full) : time();
+    return url($path) . '?v=' . $v;
+}
+
 /** Absolute URL for the current host — needed inside a QR code a phone will open. */
 function abs_url(string $path = ''): string {
     $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';

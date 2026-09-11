@@ -17,8 +17,8 @@
   --brand-dark: #025f67;  /* Blue Lagoon */
   --brand-soft: #7fc4be;
   --brand-tint: #eaf5f4;
-  --gold:       #a16207;
-  --gold-tint:  #fef6df;
+  --gold:       #6b6862;  /* neutral, deliberately not orange */
+  --gold-tint:  #f1efec;
   --red:        #a92a20;
   --red-tint:   #fbe7e5;
   --blue:       #025f67;  /* Blue Lagoon */
@@ -311,7 +311,7 @@ legend { padding: 0 .4rem; font-weight: 600; font-size: .9rem; }
 .alert.success { border-left-color: var(--brand); background: var(--brand-tint); border-color: #c2e2de; }
 .alert.error   { border-left-color: var(--red);   background: var(--red-tint);   border-color: #f0cdc9; }
 .alert.info    { border-left-color: var(--blue);  background: var(--blue-tint);  border-color: #ccdff0; }
-.alert.warning { border-left-color: var(--gold);  background: var(--gold-tint);  border-color: #f2e2b0; }
+.alert.warning { border-left-color: var(--gold);  background: var(--gold-tint);  border-color: #e0ddd7; }
 
 /* ---------- Misc ---------- */
 .muted { color: var(--muted); }
